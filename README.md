@@ -168,4 +168,48 @@ HTTP/1.1 201
 Location: /v2/tasks/1
 {"id":1,"title":"Tarea V2","done":false}
 ```
+
+---
+
+## Sesión 4
+## Evidencias
+
+### 1. Rojo — el servicio guarda el título con espacios
+
+`TaskServiceTest.createStripsTitleEdges` usa un repositorio simulado cuyo `save`
+devuelve su propio argumento. Falla porque el servicio inicial guarda
+`dto.title()` sin normalizar:
+
+![Rojo: título sin recortar](assets/Sesion4Rojo.png)
+
+### 2. Verde — `strip()` y un caso con espacios interiores
+
+El servicio aplica `String.strip()` al crear la tarea y un segundo test
+comprueba que los espacios interiores se conservan.
+
+![Verde: 12 pruebas](assets/Sesion4Verde.png)
+
+### 3. Comprobación HTTP
+
+```bash
+curl -i -X POST http://localhost:8080/v4/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"  Repasar Spring Boot  "}'
+```
+
+```text
+HTTP/1.1 201
+Location: /v4/tasks/1
+{"id":1,"title":"Repasar Spring Boot","done":false}
+```
+
+```bash
+curl http://localhost:8080/v4/tasks
+curl http://localhost:8080/v4/tasks/9999
+```
+
+```text
+[{"id":1,"title":"Repasar Spring Boot","done":false}]
+HTTP/1.1 404
+```
 ---
