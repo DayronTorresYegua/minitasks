@@ -103,3 +103,69 @@ Comprobar conexion DB
 ![ConexionDB.png](assets/ConexionDB.png)
 
 ---
+
+## Sesión 3
+
+## Evidencias
+
+### 1. Rojo — `GET /v1/tasks/{id}` todavía no existe
+
+Se escribe el test **antes** de la ruta. Crea la tarea y la consulta dentro del
+mismo test, sin depender de otros métodos:
+
+![Rojo: falta el GET](assets/Sesion3Rojo.png)
+
+### 2. Rojo — una tarea inexistente no devuelve 404
+
+![Rojo: 500 en vez de 404](assets/Sesion3Rojo404.png)
+
+### 3. Verde — `ResponseEntity` traduce el `Optional` vacío a 404
+
+El método de consulta devuelve `ResponseEntity` y conserva el caso anterior:
+
+![Verde: toda la suite](assets/Sesion3Verde.png)
+
+### 4. Comprobación HTTP
+
+
+```bash
+curl -i -X POST http://localhost:8080/v1/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Repasar controladores"}'
+```
+
+```text
+HTTP/1.1 201
+{"id":1,"title":"Repasar controladores","done":false}
+```
+
+```bash
+curl http://localhost:8080/v1/tasks
+curl http://localhost:8080/v1/tasks/1
+```
+
+```text
+[{"id":1,"title":"Repasar controladores","done":false}]
+{"id":1,"title":"Repasar controladores","done":false}
+```
+
+```bash
+curl -i http://localhost:8080/v1/tasks/999
+```
+
+```text
+HTTP/1.1 404
+```
+
+```bash
+curl -i -X POST http://localhost:8080/v2/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Tarea V2"}'
+```
+
+```text
+HTTP/1.1 201
+Location: /v2/tasks/1
+{"id":1,"title":"Tarea V2","done":false}
+```
+---
